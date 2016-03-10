@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+	<title>Hmwk 2</title>
+</head>
+
+<body>
+	<script>
+			//Declare variables
+			var hrsWorked = 50;
+			var payRate = 0; 
+			var payCheck = 0; 
+			
+			if (hrsWorked < 20) {
+				payRate = 1; 
+				}
+			else if (hrsWorked < 40) {
+				payRate = 2; 
+				}
+			else {
+				payRate = 3; 
+				} 
+				
+			switch(payRate) {
+				case 1: {
+				payCheck = hrsWorked * 10; 
+				}
+				case 2: {
+				payCheck = hrsWorked * 20; 
+				}
+				case 3: {
+				payCheck = hrsWorked * 30; 
+				}
+			}
+			
+			console.log(payCheck); 
+	</script>
+</body>
+
+</html>
