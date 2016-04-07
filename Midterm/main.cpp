@@ -79,6 +79,23 @@ void problem1(){
      * accessed and what the balance would be with this fee included. 
      * - Make sure to output the contents of the structure (a-f) 
      */
+    struct Paycheck {
+        char firstName[25];
+        char lastName[25];
+        string address; 
+        int account; 
+        float checks; 
+        float deposits; 
+    };
+    
+    Paycheck employee;
+    cout << "Please enter your first name: ";
+    cin >> employee.firstName; 
+    cout << "Please enter your last name: ";
+    cin >> employee.lastName; 
+
+    
+    
     
 }
 
