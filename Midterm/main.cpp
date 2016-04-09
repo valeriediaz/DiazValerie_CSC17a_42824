@@ -1,13 +1,31 @@
 //Valerie Diaz
-//April 7, 2016 
-//Midterm
+//April 8, 2016
+//Midterm 
+//CSC-17A-42824
 
-//System Libraries 
+//System Libraries
 #include <iostream>
-#include <iostream>
+#include <cstdlib>
+#include <iomanip>
+#include <string>
 using namespace std;
 
-//Global Constants
+//Structures
+struct EmployeeProb2 {				//Problem #2
+	string name;
+	int addressNo;
+	string streetName;
+	float hours;
+	float pay;
+	float gross;
+};
+struct statsResult {				//Problem #3
+	float avg;
+	float median;
+	int *mode;	 //array containing the modes
+	int nModes;	 //number of modes in the array
+	int maxFreq; //max frequency of modes
+};
 
 //Function Prototypes
 void Menu();
@@ -15,13 +33,19 @@ int getN();
 void def(int);
 void problem1();
 void problem2();
+float calcPay(float, float);
+void printCheck(EmployeeProb2);
+void words(int);
 void problem3();
+statsResult *avgMedMode(int *, int);
+void Sort(int *, int);
+void minPos(int *, int, int);
+void printStat(statsResult, statsResult *, int);
 void problem4();
 void problem5();
 void problem6();
-void problem7();
 
-//Execution
+//Execution begins here
 int main(int argv,char *argc[]){
     int inN;
     do{
@@ -34,9 +58,8 @@ int main(int argv,char *argc[]){
         case 4:    problem4();break;
         case 5:    problem5();break;
         case 6:    problem6();break;
-        case 7:    problem7();break;
         default:   def(inN);}
-    }while(inN>=1&&inN<=7);
+    }while(inN>=1&&inN<=6);
     return 0;
 }
 
@@ -58,120 +81,296 @@ int getN(){
 }
 
 void problem1(){
-    /* Develop an application using structures for a customer that will
-     * determine if he/she has exceeded his/her checking account balance.
-     * For each customer, the following facts are available:
-     * 
-     * a. Name
-     * b. Address
-     * c. Account number (Five digits only, test for this)
-     * d. Balance at the beginning of the month
-     * e. Total of all checks written by this customer this month
-     *      - Loop until customer is through entering checks
-     * f. Total of all deposits credited to this customer's account this month
-     *      - Loop until customer is through entering deposits 
-     * 
-     * - Dynamically create the structure
-     * - Input each of these facts (a-f) from input dialogs 
-     * - Store in a structure, calculate new balance, display new balance
-     * and debit the account $15 if overdrawn 
-     * - If overdrawn, tell the customer the additional $15 fee has been 
-     * accessed and what the balance would be with this fee included. 
-     * - Make sure to output the contents of the structure (a-f) 
-     */
-    struct Paycheck {
-        char firstName[25];
-        char lastName[25];
-        string address; 
-        int account; 
-        float checks; 
-        float deposits; 
-    };
-    
-    Paycheck employee;
-    cout << "Please enter your first name: ";
-    cin >> employee.firstName; 
-    cout << "Please enter your last name: ";
-    cin >> employee.lastName; 
+	//PROBLEM 1
+	cout << "In problem #1 " << endl << endl;
+	cout << "There's nothing here..." << endl << endl;
 
-    
-    
-    
 }
 
 void problem2(){
-    /* Develop an application using an array of structures that will 
-     * determine the gross pay for any number of employees input. 
-     * The company pays "straight-time" for the first 40hrs worked, 
-     * double time for all hours worked in excess of 40hrs but less than 50hrs, 
-     * and triple time for any hours worked over 50hrs
-     * 
-     * - Program should loop and input the employee's name, hours worked, and
-     * rate of pay. ($/hr) 
-     * - Output information including the gross pay in the form of a paycheck
-     * - Process starts again until you input an invalid rate of pay or hrs
-     * worked. This means negative rate of pay or negative number of hrs worked
-     * is not acceptable. 
-     * 
-     * Paycheck 
-     * Company
-     * Address
-     * Name:    Amount: numerical
-     * Amount: English
-     * Signature: 
-     */
+	//PROBLEM 2
+	cout << "In problem #2 - Paycheck " << endl << endl;
+
+	//Declaration;
+	EmployeeProb2 *info;
+	float hoursWorked;
+	float payRate;
+	string empName;
+	int addressTemp;
+	string streetTemp;
+	int employeeTotal = 1;
+	int count = 0;
+
+	info = new EmployeeProb2[employeeTotal];
+	do {
+		//Prompt user for info
+		cin.ignore();
+		cout << "Enter your name: ";
+		getline(cin, empName);
+		cout << "Enter your address #: ";
+		cin >> addressTemp;
+		cin.ignore();
+		cout << "Enter your street name: ";
+		getline(cin, streetTemp);
+		cout << "Enter rate of pay: ";
+		cin >> payRate;
+		cin.ignore();
+		cout << "Enter total hours worked: ";
+		cin >> hoursWorked;
+		cin.ignore();
+		cout << endl << endl;
+
+		//Input validation and call functions
+		if ((hoursWorked > 0.0) && (payRate > 0.0)) {
+			info[count].name = empName;
+			info[count].addressNo = addressTemp;
+			info[count].streetName = streetTemp;
+			info[count].pay = payRate;
+			info[count].hours = hoursWorked;
+			info[count].gross = calcPay(hoursWorked, payRate);
+			printCheck(info[count]);
+			count++;
+		}
+	}while((hoursWorked > 0.0) && (payRate > 0.0) && (count < employeeTotal));
+
+	//Deallocate memory
+	delete []info;
+}
+
+//Function for calculating gross pay
+float calcPay(float hours, float payRate) {
+	//Declaration
+	float doubleTime = 2.0;
+	float tripleTime = 3.0;
+	float doubleHours = 40;
+	float tripleHours = 50;
+	float totalPay = 0.0;
+
+	//Calculate gross pay - based on hours worked
+	if (hours > tripleHours) {
+		totalPay += ((hours - tripleHours) * (tripleTime * payRate));
+		hours -= (hours - tripleHours);
+	}
+	if (hours > doubleHours && hours < tripleHours) {
+		totalPay += ((hours - doubleHours) * (doubleTime * payRate));
+		hours -= (hours - doubleHours);
+	}
+	if (hours > 0.0) {
+		totalPay += hours * payRate;
+	}
+	return totalPay;
+}
+
+//Function that generates check
+void printCheck(EmployeeProb2 emp) {
+	//Declaration
+	int dollars;
+	int cents;
+	string checkDollars;
+
+	//Calculate dollars and cents based on gross pay from structure
+	dollars = static_cast<int>(emp.gross);
+	cents = static_cast<int>((emp.gross-static_cast<float>(dollars))*100);
+
+	//Output to check
+	cout << "EMPLOYEE PAYCHECK " << endl << endl;
+	cout << "PAY TO: " << emp.name << setw(40) << "AMOUNT: $" << emp.gross;
+	cout << endl;
+	cout << setw(8) << " " << emp.addressNo << " " << emp.streetName;
+	cout << endl << endl;
+	words(dollars);
+	cout << " & " << cents/10 << cents % 10 << "/100 DOLLARS" << endl << endl;
+}
+
+//Function for converting check value to text
+void words(int checkValue) {
+	const char * const singles[20] = {
+			"ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN",
+			"EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE", "THIRTEEN",
+			"FOURTEEN", "FIFTEEN", "SIXTEEN", "SEVENTEEN", "EIGHTEEN",
+			"NINETEEN"
+	};
+	const char * const tens[10] = {
+			"", "TEN", "TWENTY", "THIRTY", "FOURTY", "FIFTY", "SIXTY"
+			"SEVENTY", "EIGHTY", "NINETY"
+	};
+	if (checkValue >= 1000) {
+		words(checkValue / 1000);
+		cout << "THOUSAND";
+		if (checkValue % 1000) {
+			if (checkValue % 1000 < 100) {
+				cout << " AND";
+			}
+			cout << " ";
+			words(checkValue % 1000);
+		}
+	}
+	else if (checkValue >= 100) {
+		words(checkValue / 100);
+		cout << " HUNDRED";
+		if (checkValue % 100) {
+			cout << " AND ";
+			words(checkValue % 100);
+		}
+	}
+	else if (checkValue >= 20) {
+		cout << tens[checkValue / 10];
+		if (checkValue % 10) {
+			cout << " ";
+			words(checkValue % 10);
+		}
+	}
+	else {
+		cout << singles[checkValue];
+	}
 }
 
 void problem3(){
-     /*Write a function using the following structure and prototype.
+	//PROBLEM 3
+	cout << "In problem #3 - Average, Median, Mode " << endl << endl;
 
-struct statsResult
-{
-    float avg;
-    float median;
-    int *mode;   //array containing the modes
-    int nModes;  //number of modes in the array
-    int maxFreq; //max frequency of modes
-};
+	//Declaration
+	int size;
 
-statsResult *avgMedMode(int *,int); 
+	//Prompt user for size of array
+	cout << "What is the size of the array? ";
+	cin >> size;
 
-The function takes in an integer array and the size of the array.
-Then returns a pointer to a structure containing the average, median
-and mode.  You will then write a printStat() function that will print
-the results contained in the stats structure.  I will input a small 
-array to test this out so ask for how many inputs to fill the array, 
-then the values to place into the array.  Make sure you delete the 
-dynamic array creation for the mode when you exit the problem.
+	//Fill array
+	int array[size];
+	for (int i = 0; i < size; i++) {
+		cout << "Enter the value of the array: ";
+		cin >> array[i];
+	}
+	//Call avgMedMode function
+	avgMedMode(array, size);
+	cout << endl;
+}
 
-      */
+//Function that calculates average, median, and mode
+statsResult *avgMedMode(int *a, int num) {
+	//Declaration
+	statsResult result;
+	float total = 0;
+	int medianA, medianB, medianOdd, middle;
+
+	//Calculate average
+	for (int i = 0; i < num; i++) {
+		total = total + a[i];
+	}
+	cout << setprecision(2) << fixed;
+	result.avg = total / num;
+	//Sort array
+	Sort(a, num);
+	for (int i = 0; i < num; i++) {
+		cout << a[i] << " ";
+	}
+	cout << endl;
+	//Calculate median - if even
+	if (num % 2 == 0) {
+		medianA = (num / 2) - 1;
+		medianB = num / 2;
+		middle = (a[medianA] + a[medianB]) / 2;
+		result.median = middle;
+	}
+	//Calculate median - if odd
+	else {
+		medianOdd = num / 2;
+		result.median = a[medianOdd];
+	}
+	//Calculate max Frequency
+	result.nModes = 1;
+	int max = 1;
+	//Loop and compare
+	for (int i = 1; i < num; i++) {
+		if (a[i - 1] == a[i]) {
+			result.nModes++;
+			if (result.nModes > max)max = result.nModes;
+		}
+		else {
+			result.nModes = 1;
+		}
+	}
+	result.maxFreq = max;
+	result.nModes = 0;
+	//Calculate mode
+	statsResult *c = new statsResult;
+	c->mode = new int [num];
+	int temp = a[1];
+	for (int i = 0; i < num - 1; i++) {
+		if (a[i] == temp) {
+			result.nModes++;
+			if (result.nModes == result.maxFreq) {
+				c->mode[i] = a[i];
+				result.nModes = 0;
+				temp = a[i + 1];
+			}
+		}
+	if (a[i] ==! temp) {
+		result.nModes = 0;
+		temp = a[i + 1];
+		}
+	}
+	printStat(result, c, num);
+	cout << endl;
+
+	//Deallocate memory
+	delete []c->mode;
+	delete []c;
+}
+
+//Function that sorts array
+void Sort(int *a, int n) {
+	for (int i = 0; i < n - 1; i++) {
+		minPos(a, n, i);
+	}
+}
+
+//Function used for sort
+void minPos(int *a, int n, int pos) {
+	for(int i = pos + 1; i < n; i++) {
+		if (*(a + pos) > *(a + i)) swap (*(a + pos), *(a + i));
+	}
+}
+
+//Function that outputs results
+void printStat(statsResult r, statsResult *c, int n) {
+	cout << endl;
+	cout << "Average: " << r.avg << endl;
+	cout << "Median: " << r.median << endl;
+	cout << "Max Frequency " << r.maxFreq << endl;
+	cout << "Modes: ";
+	for (int i = 0; i < n; i++) {
+		cout << c->mode[i] << " ";
+	}
 }
 
 void problem4(){
     //PROBLEM 4
-    
-    //Declaration  
+	cout << "In problem #4 - Encryption/Decryption " << endl << endl;
+
+    //Declaration
     int number;
-    int num1, num2, num3, num4; 
-    int encrypt1, encrypt2, encrypt3, encrypt4; 
+    int num1, num2, num3, num4;
+    int encrypt1, encrypt2, encrypt3, encrypt4;
     int temp;
     bool fourdigit = false;
     bool zerothroughseven = false;
- 
-    //ENCRYPTION PROGRAM*******************************************************/ 
+
+    //ENCRYPTION//
     do {
-        //Prompt user for input 
-        cout << "Please enter the four digit number to be encrypted: "; 
-        cin >> number; 
-        //Check if number is four digits 
+        //Prompt user for input
+        cout << "Please enter the four digit number to be encrypted: ";
+        cin >> number;
+        //Check if number is four digits
         if (number > 9999) {
             cout << "That is not a four digit number." << endl;
         }
         else {
-            fourdigit = true; 
+            fourdigit = true;
         }
-        //Find value of each digit  
-        num1 = number/1000; 
+        //Find value of each digit
+        num1 = number/1000;
         num2 = (number % 1000)/100;
         num3 = ((number % 1000) % 100)/10;
         num4 = (((number % 1000)) % 100) % 10;
@@ -193,9 +392,9 @@ void problem4(){
                 zerothroughseven = true;
             }
         }
-    } while(fourdigit == false || zerothroughseven == false); 
-    //Set values to encryption variables 
-    encrypt1 = num1; 
+    } while(fourdigit == false || zerothroughseven == false);
+    //Set values to encryption variables
+    encrypt1 = num1;
     encrypt2 = num2;
     encrypt3 = num3;
     encrypt4 = num4;
@@ -206,81 +405,66 @@ void problem4(){
     encrypt4 = (encrypt4 + 5) % 8;
     //Encryption - swap
     temp = encrypt1;
-    encrypt1 = encrypt4; 
-    encrypt4 = temp;
-    temp = encrypt2;
-    encrypt2 = encrypt3;
-    encrypt3 = temp;
-    //Output encrypted number
-    cout << "Your encrypted number is: " 
-         << encrypt1 << encrypt2 << encrypt3 << encrypt4 <<endl<<endl;
-    
-    //DECRYPTION PROGRAM*******************************************************/
-    cout << "Please enter the four digit number to be decrypted: ";
-    cin >> number; 
-    
-    encrypt1 = number/1000; 
-    encrypt2 = (number % 1000)/100;
-    encrypt3 = ((number % 1000) % 100)/10;
-    encrypt4 = (((number % 1000)) % 100) % 10;
-    
-    //Decryption - swap
-    temp = encrypt1; 
     encrypt1 = encrypt4;
     encrypt4 = temp;
     temp = encrypt2;
     encrypt2 = encrypt3;
     encrypt3 = temp;
-    //Decryption - reverse mod 8, add 5 
-    encrypt1 = (encrypt1 - 5 + 8) % 8; 
+    //Output encrypted number
+    cout << "Your encrypted number is: "
+         << encrypt1 << encrypt2 << encrypt3 << encrypt4 <<endl<<endl;
+
+    //DECRYPTION//
+    cout << "Please enter the four digit number to be decrypted: ";
+    cin >> number;
+
+    encrypt1 = number/1000;
+    encrypt2 = (number % 1000)/100;
+    encrypt3 = ((number % 1000) % 100)/10;
+    encrypt4 = (((number % 1000)) % 100) % 10;
+
+    //Decryption - swap
+    temp = encrypt1;
+    encrypt1 = encrypt4;
+    encrypt4 = temp;
+    temp = encrypt2;
+    encrypt2 = encrypt3;
+    encrypt3 = temp;
+    //Decryption - reverse mod 8, add 5
+    encrypt1 = (encrypt1 - 5 + 8) % 8;
     encrypt2 = (encrypt2 - 5 + 8) % 8;
     encrypt3 = (encrypt3 - 5 + 8) % 8;
     encrypt4 = (encrypt4 - 5 + 8) % 8;
-    
+
     //Output decrypted number
     cout << "Your decrypted number is: "
          << encrypt1 << encrypt2 << encrypt3 << encrypt4 <<endl<<endl;
 }
 
 void problem5(){
-    /* a) Using a byte variable, what is the largest factorial that can 
-be calculated.  A factorial is simply 
+    //PROBLEM 5
+	cout << "In problem 5 - Factorials " << endl << endl;
 
-n! = 1 * 2 * 3 * 4 ... * (n-2) * (n-1) * n
+	double x = 1;
+	int factorial = 170;
+	for (int i = 1; i <= factorial; i++) {
+		x = x * i;
+	}
 
-For instance, 1! = 1,  2! = 2,  3! = 6,  4! = 24,  5! = 120 etc....
-
-b)  What would be the largest factorial using short, int, long, float, 
-double, etc...  Use all the primitive data types that you are familiar 
-with signed as well as unsigned.
-
-Note:  I want you to have fun investigating this and the program you 
-turn in should just print "cout" the final results.  You don't know 
-how to capture errors yet so run each till it overflows then back off by 1.
-Don't need the program that tests for this.
-     */
+	cout << "Data Type: Double" << endl;
+	cout << "The largest factorial for double: ";
+	cout << "170! = " << x << endl << endl;
 }
 
 void problem6(){
-  /*
-    a)  Convert the following 2 numbers to binary, octal and hex.
-	2.125, 0.1328125
-        When done, convert the following to a float representation
-        by the definition in class. In other words, I want an 8 digit hex 
-	number representation using the 4 byte float specification
-        defined in class.  
-   b)  Do the same for a) given they are negative values.
-   c)  Convert the float representations of the following into 
-	the decimal number given the definition in class.
-	46666601, 46666602, B9999AFE
+	//PROBLEM 6
+	cout << "In problem 6 - Conversions " << endl << endl;
 
-Note:  This doesn't require a program, however, I want you to write a 
-simple function that outputs the answers you did by hand with "cout".
-   */
-}
-
-void problem7(){
-    //EXTRA CREDIT 
+	cout << "2.125" << endl;
+	cout << "Binary: 10.001" << endl;
+	cout << "Octal: 2.1" << endl;
+	cout << "Hex: 2.2" << endl << endl;
+	cout << "-2.125" << endl;
 }
 
 void def(int inN){
